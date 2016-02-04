@@ -96,7 +96,7 @@ function Declare-Variables()
         New-Variable -Name scriptLocation -Scope 2 -Value 'C:\temp\Scripts\Get-WordsList'
         if(-Not (Test-Path $scriptLocation))
         {
-            New-Item -Path $scriptLocation -ItemType directory
+            New-Item -Path $scriptLocation -ItemType directory | out-null
         }
     }
     
