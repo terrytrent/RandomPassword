@@ -723,18 +723,3 @@ function Get-RandomDiceRoll()
     return $Roll
     
 }
-function Get-CryptoSeed()
-{
-    $bytes = New-Object -TypeName byte[] -ArgumentList (4)
-    $RNG = [Security.Cryptography.RNGCryptoServiceProvider]::Create()
-    $RNG.GetBytes($bytes)
-    
-    $totalInt = 1
-    foreach($int in $bytes)
-    {
-        $totalInt = $totalInt * $int
-    }
-    $RandomSeed = ($totalInt / 2) -1
-    return $RandomSeed
-}
-
