@@ -51,35 +51,35 @@ function Validate-Parameters()
 {
     if((($PasswordType -eq 'Word List') -or ($PasswordType -eq 'DiceWare Passphrase')) -and ($ComplexitySwitchesEnabled -eq $true))
     {
-        $message = "Cannot use Complexity Switches with Word List Passwords.`nBreaking Script."
-        Write-Host  -Object $message -ForegroundColor Red
+        $message = "Cannot use Complexity Switches with '$PasswordType' Passwords."
+        throw($message)
         break
     }
     
     if(($PasswordType -eq 'Word List') -or ($PasswordType -eq 'DiceWare Passphrase'))
     {
-        Write-Host -Object "You have selected a '$PasswordType' Password - this will take a few moments to generate...`n" -ForegroundColor Yellow
+        write-warning -Message "You have selected a '$PasswordType' Password - this will take a few moments to generate"
     }
     
     if((($PasswordType -eq 'Word List') -or ($PasswordType -eq 'DiceWare Passphrase')) -and ($Length -ne $null))
     {
-        Write-Host -Object "Cannot use Length Parameter with '$PasswordType' Password Type.`nIgnoring Length Parameter`n" -ForegroundColor Yellow
-        $Length = $null
+        write-warning -Message "Cannot use Length Parameter with '$PasswordType' Password Type. Ignoring Length Parameter."
+        Set-Variable -Name Length -Scope 2 -Value $null
     }
         
     if(($PasswordType -eq 'Random Characters') -and ($Length -eq $null))
     {
-        Write-Host -Object "Length was not set.  Cannot use Null Length with 'Random Characters' Password Type.`nDefaulting to 16 Characters." -ForegroundColor Yellow
+        Write-Warning -Message "Length was not set.  Cannot use Null Length with 'Random Characters' Password Type.`nDefaulting to 16 Characters."
         Set-Variable -Name Length -Scope 2 -Value 16
     }
         
     if(($PasswordType -eq 'Random Characters') -and (($Length -ne $null) -or ($Length -lt 8)))
     {
         $lengthType = ($Length.GetType()).name
-        $message = "The variable cannot be validated because the value '$Length' is not a valid value for the Length Parameter.`nPlease choose a number between 8 and 2048.`nBreaking Script."
         if(($lengthType -ne 'Int32') -or ($Length -lt 8))
         {
-            Write-Host  -Object $message -ForegroundColor Red
+            $message = "The variable cannot be validated because the value '$Length' is not a valid value for the Length Parameter.`nPlease choose a number between 8 and 2048."
+            throw("$message")
             break
         }
     }
