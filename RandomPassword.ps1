@@ -116,12 +116,12 @@ function Test-ComplexitySwitches()
         
     if($ComplexitySwitches -contains $true)
     {
-Set-Variable -Name ComplexitySwitchesEnabled -Value $true -Scope 2
-}
+        Set-Variable -Name ComplexitySwitchesEnabled -Value $true -Scope 2
+    }
     else
     {
-Set-Variable -Name ComplexitySwitchesEnabled -Value $false -Scope 2
-}
+        Set-Variable -Name ComplexitySwitchesEnabled -Value $false -Scope 2
+    }
 }
 function Set-AsciiCodes()
 {    
@@ -131,8 +131,8 @@ function Set-AsciiCodes()
     $NumbersAsciiCodes = Set-NumbersAsciiCodes
     New-Variable -Name ASCIICodes -Scope 1 -Value $(foreach($_ in ($LowerCaseAsciiCodes, $UpperCaseAsciiCodes, $SymbolsAsciiCodes, $NumbersAsciiCodes))
         {
-$_
-}
+            $_
+        }
     )
 }
 function Set-AsciiCodesIfComplexitySpecified()
@@ -145,13 +145,13 @@ function Set-AsciiCodesIfComplexitySpecified()
     {
         if($Switch)
         {
-return $AsciiCodes
-}
+            return $AsciiCodes
+        }
     }
     else
     {
-return $AsciiCodes
-}
+        return $AsciiCodes
+    }
 }
 function Set-LowerCaseAsciiCodes()
 {
@@ -168,9 +168,9 @@ function Set-UpperCaseAsciiCodes()
 function Set-SymbolsAsciiCodes()
 {
     $SymbolsValues = foreach($_ in ($(33..47), $(58..64), $(91..96), $(123..126)))
-    {
-$_
-}
+        {
+            $_
+        }
     $SymbolsAsciiCodes = Set-AsciiCodesIfComplexitySpecified -Switch $Symbols -AsciiCodes $SymbolsValues
     return $SymbolsAsciiCodes
 }
@@ -229,8 +229,8 @@ function Convert-AsciiCodesToChar()
     )
     foreach($char in $(0..$RandomAsciiCodes.Length))
     {
-$passwordAsciiArray += @([char]($RandomAsciiCodes[$char]))
-}
+        $passwordAsciiArray += @([char]($RandomAsciiCodes[$char]))
+    }
         
     $passwordAsciiJoined = ($passwordAsciiArray -join '').substring(0,$RandomAsciiCodes.count)
 
@@ -242,8 +242,8 @@ function Test-PasswordComplexity()
     
     foreach($asciiCode in $RandomPasswordAsArray)
     {
-Generate-AsciiTotals -value $asciiCode
-}
+        Generate-AsciiTotals -value $asciiCode
+    }
 
     Generate-CharacterTypeTotals
     
@@ -251,8 +251,8 @@ Generate-AsciiTotals -value $asciiCode
     {
         if($value -lt 1 -and $value -ne $null)
         {
-$rerun = $true
-}
+            $rerun = $true
+        }
     }
     return $rerun
 }
@@ -275,12 +275,12 @@ function Generate-AsciiTotals()
         
     if($ComplexitySwitchesEnabled)
     {
-Test-AsciiCodesOfValueBasedOnSwitches -value $value
-}
+        Test-AsciiCodesOfValueBasedOnSwitches -value $value
+    }
     else
     {
-Test-AsciiCodesOfValue -value $value
-}
+        Test-AsciiCodesOfValue -value $value
+    }
 }
 function Test-AsciiCodesOfValueBasedOnSwitches()
 {
@@ -347,12 +347,12 @@ function Test-IfValueIsLowerCase()
     
     if($LowerCaseAsciiCodes -contains $asciiCodeForValue)
     {
-return 1
-}
+        return 1
+    }
     else
     {
-return 0
-}
+        return 0
+    }
 }
 function Test-IfValueIsUpperCase()
 {
@@ -365,12 +365,12 @@ function Test-IfValueIsUpperCase()
     
     if($UpperCaseAsciiCodes -contains $asciiCodeForValue)
     {
-return 1
-}
+        return 1
+    }
     else
     {
-return 0
-}
+        return 0
+    }
 }
 function Test-IfValueIsSymbol()
 {
@@ -383,12 +383,12 @@ function Test-IfValueIsSymbol()
     
     if($SymbolAsciiCodes -contains $asciiCodeForValue)
     {
-return 1
-}
+        return 1
+    }
     else
     {
-return 0
-}
+        return 0
+    }
 }
 function Test-IfValueIsNumber()
 {
@@ -401,12 +401,12 @@ function Test-IfValueIsNumber()
     
     if($NumberAsciiCodes -contains $asciiCodeForValue)
     {
-return 1
-}
+        return 1
+    }
     else
     {
-return 0
-}
+        return 0
+    }
 }
 function Generate-CharacterTypeTotals()
 {
@@ -414,28 +414,28 @@ function Generate-CharacterTypeTotals()
     {
         if($LowerCase)
         {
-Set-Variable -Name CharacterTypeTotals -Value @($AsciiTotals.LowerCase) -Scope 1
-}
+            Set-Variable -Name CharacterTypeTotals -Value @($AsciiTotals.LowerCase) -Scope 1
+        }
             
         if($UpperCase)
         {
-Set-Variable -Name CharacterTypeTotals -Value @($CharacterTypeTotals[0], $AsciiTotals.UpperCase) -Scope 1
-}
+            Set-Variable -Name CharacterTypeTotals -Value @($CharacterTypeTotals[0], $AsciiTotals.UpperCase) -Scope 1
+        }
             
         if($Symbols)
         {
-Set-Variable -Name CharacterTypeTotals -Value @($CharacterTypeTotals[0], $CharacterTypeTotals[1], $AsciiTotals.Symbols) -Scope 1
-}
+            Set-Variable -Name CharacterTypeTotals -Value @($CharacterTypeTotals[0], $CharacterTypeTotals[1], $AsciiTotals.Symbols) -Scope 1
+        }
             
         if($Numbers)
         {
-Set-Variable -Name CharacterTypeTotals -Value @($CharacterTypeTotals[0], $CharacterTypeTotals[1], $CharacterTypeTotals[2], $AsciiTotals.Numbers) -Scope 1
-}
+            Set-Variable -Name CharacterTypeTotals -Value @($CharacterTypeTotals[0], $CharacterTypeTotals[1], $CharacterTypeTotals[2], $AsciiTotals.Numbers) -Scope 1
+        }
     }
     else
     {
-Set-Variable -Name CharacterTypeTotals -Value @($AsciiTotals.LowerCase, $AsciiTotals.UpperCase, $AsciiTotals.Symbols, $AsciiTotals.Numbers) -Scope 1
-}
+        Set-Variable -Name CharacterTypeTotals -Value @($AsciiTotals.LowerCase, $AsciiTotals.UpperCase, $AsciiTotals.Symbols, $AsciiTotals.Numbers) -Scope 1
+    }
 }
 function Get-WordListPassword()
 {
@@ -451,8 +451,8 @@ function Get-WordListPassword()
     }
     else
     {
-Import-WordListFromCSV
-}
+        Import-WordListFromCSV
+    }
 
     Set-Variable -Name RandomPassword -Value $(Get-RandomWords) -Scope 1    
 }
@@ -460,58 +460,58 @@ function Get-WordFileUIRHeaders()
 {
     try
     {
-New-Variable -Name wordsRequest -Value $(Invoke-WebRequest -Uri $wordsUri -Method head -ErrorAction SilentlyContinue) -Scope 1
-}
+        New-Variable -Name wordsRequest -Value $(Invoke-WebRequest -Uri $wordsUri -Method head -ErrorAction SilentlyContinue) -Scope 1
+    }
     catch
     {
         try
         {
-$wordsContent = Import-Csv -Path $wordsContentFileFull
-}
+            $wordsContent = Import-Csv -Path $wordsContentFileFull
+        }
         catch
         {
-break
-}
+            break
+        }
         return $wordsContent
         break
     }
 }
 function Get-LastFileModifiedContent()
 {
-New-Variable -Name localLastModified -Value $(Get-Content -Path $lastModifiedFile -ErrorAction SilentlyContinue) -Scope 1
+    New-Variable -Name localLastModified -Value $(Get-Content -Path $lastModifiedFile -ErrorAction SilentlyContinue) -Scope 1
 }
 function Generate-WordList()
 {
-New-Variable -Name wordsContent -Scope 1 -Value $(Get-WordListFromURI)
+    New-Variable -Name wordsContent -Scope 1 -Value $(Get-WordListFromURI)
 }
 function Get-WordListFromURI()
 {
     $list = (Invoke-WebRequest -Uri $wordsUri).content -split '\n' | Select-Object -Skip 2 -Property @{
         label      = 'WordList'
         expression = {
-$_
-}
+            $_
+        }
     }
     return $list
 }
 function Export-WordList()
 {
-$wordsContent | Export-Csv -NoTypeInformation -Path $wordsContentFileFull
+    $wordsContent | Export-Csv -NoTypeInformation -Path $wordsContentFileFull
 }
 function Export-LastModifiedFile()
 {
-$wordsLastModified | Out-File -FilePath $lastModifiedFile
+    $wordsLastModified | Out-File -FilePath $lastModifiedFile
 }
 function Import-WordListFromCSV()
 {
     try
     {
-New-Variable -Name wordsContent -Scope 1 -Value $(Import-Csv -Path $wordsContentFileFull)
-}
+        New-Variable -Name wordsContent -Scope 1 -Value $(Import-Csv -Path $wordsContentFileFull)
+    }
     catch
     {
-break
-}
+        break
+    }
 }
 function Get-RandomWords()
 {
