@@ -6,6 +6,7 @@ First and foremost this script allows you to create two kinds of passwords:
 
 1. Random Characters
 2. Random Words
+3. Diceware Passphrase
 
 Random Characters
 -----------------
@@ -38,6 +39,20 @@ For Example:
     SixainesLaryngectomyWearer
 
 This can take several minutes because the script needs to download the word list (over 20000 words), verify it is up to date, and then pull random words from this list.
+
+Diceware Passphrase
+-------------------
+The third kind of password, Diceware Passphrase, can be generated with the following command:
+
+    Get-RandomPassword -PasswordType 'DiceWare Passphrase'
+
+This command generates a password (passphrase) containing 8 words and randomly assigned special characters or digits, as specified on http://world.std.com/~reinhold/diceware.html.
+
+The word list used to generate the passphrase can be found at http://world.std.com/~reinhold/diceware.wordlist.asc.
+
+For Example:
+
+    tonic wavy0 brew{ noon8 echo adopt< hood
 
 Clean Code
 ----------
