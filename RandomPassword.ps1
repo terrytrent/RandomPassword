@@ -567,7 +567,6 @@ function Test-PassphraseLength()
     {
         return $true
     }
-        
 }
 function Get-DicewareWord()
 {
@@ -575,12 +574,12 @@ function Get-DicewareWord()
     $NumberOfRoles=5
     $WordList=Get-DicewareWordList
     $Number=Get-DicewareNumber
-    $SpecialorDigit=Get-SpecialOrDigit
     $RandomBool=Get-RandomBool
     
     $Word=$($WordList | where {$_.Number -eq $Number}).Word
     if($RandomBool)
     {
+        $SpecialorDigit=Get-SpecialOrDigit
         $WordWithSpecialOrDigit="$Word$SpecialOrDigit"
         return $WordWithSpecialOrDigit
     }
@@ -588,7 +587,6 @@ function Get-DicewareWord()
     {
         return $Word
     }
-    
 }
 function Get-RandomBool()
 {
@@ -598,22 +596,20 @@ function Get-RandomBool()
         0 {return $false}
         1 {return $true}
     }
-    
 }
 function Get-SpecialOrDigit()
 {
     $SidesOfDice=6
     $Number1=Get-RandomDiceRoll -min 0 -max $SidesOfDice
     $Number2=Get-RandomDiceRoll -min 0 -max $SidesOfDice
-    $table=Generate-DicewareSpecialOrDigitTable
+    $DicewareSpecialOrDigitTable=Generate-DicewareSpecialOrDigitTable
     
-    $Character=$table[$number1][$number2]
+    $Character=$DicewareSpecialOrDigitTable[$number1][$number2]
     return $Character
-    
 }
 function Generate-DicewareSpecialOrDigitTable()
 {
-    $table=@(
+    $DicewareSpecialOrDigitTable=@(
         @('~','!','#','$','%','^'),
         @('&','*','(',')','-','='),
         @('+','[',']','\','{','}'),
@@ -621,8 +617,7 @@ function Generate-DicewareSpecialOrDigitTable()
         @('?','/','0','1','2','3'),
         @('4','5','6','7','8','9')
     )
-    return $table
-    
+    return $DicewareSpecialOrDigitTable
 }
 function Get-DicewareWordList()
 {
@@ -721,5 +716,4 @@ function Get-RandomDiceRoll()
     $Roll=Get-Random -SetSeed $Seed -Minimum $min -Maximum $max
     
     return $Roll
-    
 }
