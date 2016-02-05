@@ -129,7 +129,7 @@ function Set-AsciiCodes()
     $UpperCaseAsciiCodes = Set-UpperCaseAsciiCodes
     $SymbolsAsciiCodes = Set-SymbolsAsciiCodes
     $NumbersAsciiCodes = Set-NumbersAsciiCodes
-    New-Variable -Name ASCIICodes -Scope 1 -Value $(foreach($_ in ($LowerCaseAsciiCodes, $UpperCaseAsciiCodes, $SymbolsAsciiCodes, $NumbersAsciiCodes))
+    New-Variable -Name ASCIICodes -Scope 2 -Value $(foreach($_ in ($LowerCaseAsciiCodes, $UpperCaseAsciiCodes, $SymbolsAsciiCodes, $NumbersAsciiCodes))
         {
             $_
         }
@@ -198,12 +198,13 @@ function Declare-GeneratePasswordLoopVariables()
 }
 function Get-RandomCodesFromAsciiCodes()
 {
-    $TotalLength = $(Get-Variable -Name length -ValueOnly -Scope 2)
+    $TotalLength = $(Get-Variable -Name length -ValueOnly -scope 2)
+    $AllAsciiCodes = $(Get-Variable -Name AsciiCodes -ValueOnly -scope 2)
     $RandomAsciiCodes = @()
     foreach($value in (1..$TotalLength))
     {
         $Seed = Get-CryptoSeed
-        $RandomAsciiCodes += $(Get-Random -InputObject $AsciiCodes -Count 1 -SetSeed $Seed)
+        $RandomAsciiCodes += $(Get-Random -InputObject $AllAsciiCodes -Count 1 -SetSeed $Seed)
     }
     
     return $RandomAsciiCodes
