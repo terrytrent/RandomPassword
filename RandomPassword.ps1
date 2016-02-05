@@ -4,7 +4,7 @@ function Get-RandomPassword()
     Param(
         
         [parameter(Mandatory = $true,Position = 0)]
-        [ValidateSet('Random Characters','Word List')]
+        [ValidateSet('Random Characters','Word List','DiceWare Passphrase')]
         $PasswordType,
         
         $Length,
@@ -27,12 +27,16 @@ function Get-RandomPassword()
     
     if($PasswordType -eq 'Random Characters')
     {
-Generate-Password
-}
+        Generate-Password
+    }
     elseif($PasswordType -eq 'Word List')
     {
-Get-WordListPassword
-}
+        Get-WordListPassword
+    }
+    elseif($PasswordType -eq 'DiceWare Passphrase')
+    {
+        Get-DiceWarePassphrase
+    }
 
     return $RandomPassword
 }
@@ -45,21 +49,21 @@ function Setup()
 }
 function Validate-Parameters()
 {
-    if(($PasswordType -eq 'Word List') -and ($ComplexitySwitchesEnabled -eq $true))
+    if((($PasswordType -eq 'Word List') -or ($PasswordType -eq 'DiceWare Passphrase')) -and ($ComplexitySwitchesEnabled -eq $true))
     {
         $message = "Cannot use Complexity Switches with Word List Passwords.`nBreaking Script."
         Write-Host  -Object $message -ForegroundColor Red
         break
     }
     
-    if(($PasswordType -eq 'Word List'))
+    if(($PasswordType -eq 'Word List') -or ($PasswordType -eq 'DiceWare Passphrase'))
     {
-Write-Host -Object "You have selected a Word List Password - this will take some a few moments to generate...`n" -ForegroundColor Yellow
-}
+        Write-Host -Object "You have selected a '$PasswordType' Password - this will take a few moments to generate...`n" -ForegroundColor Yellow
+    }
     
-    if(($PasswordType -eq 'Word List') -and ($Length -ne $null))
+    if((($PasswordType -eq 'Word List') -or ($PasswordType -eq 'DiceWare Passphrase')) -and ($Length -ne $null))
     {
-        Write-Host -Object "Cannot use Length Parameter with 'Word List' Password Type.`nIgnoring Length Parameter`n" -ForegroundColor Yellow
+        Write-Host -Object "Cannot use Length Parameter with '$PasswordType' Password Type.`nIgnoring Length Parameter`n" -ForegroundColor Yellow
         $Length = $null
     }
         
@@ -89,20 +93,22 @@ function Declare-Variables()
     $thisScript = $MyInvocation.MyCommand
     try
     {
-New-Variable -Name scriptLocation -Scope 2 -Value $(Split-Path -Path $thisScript.path -Parent)
-}
+        New-Variable -Name scriptLocation -Scope 2 -Value $(Split-Path -Path $thisScript.path -Parent)
+    }
     catch
     {
         New-Variable -Name scriptLocation -Scope 2 -Value 'C:\temp\Scripts\Get-WordsList'
         if(-Not (Test-Path $scriptLocation))
         {
-$null = New-Item -Path $scriptLocation -ItemType directory
-}
+            $null = New-Item -Path $scriptLocation -ItemType directory
+        }
     }
     
     New-Variable -Name wordsUri -Value 'http://www.freescrabbledictionary.com/sowpods/download/sowpods.txt' -Scope 2
     New-Variable -Name lastModifiedFile -Value "$scriptLocation\lastmodified.txt" -Scope 2
     New-Variable -Name wordsContentFileFull -Value "$scriptLocation\WordList.csv" -Scope 2
+    New-Variable -Name DiceWareWordsFileFullPath -Value "$scriptLocation\DiceWareWordList.csv" -Scope 2
+    New-Variable -Name NumberOfWordsInDiceWarePassphrase -Value 7 -Scope 2
 }
 function Test-ComplexitySwitches()
 {
@@ -211,8 +217,8 @@ function Get-CryptoSeed()
     $totalInt = 1
     foreach($int in $bytes)
     {
-$totalInt = $totalInt * $int
-}
+        $totalInt = $totalInt * $int
+    }
     $RandomSeed = ($totalInt / 2) -1
     return $RandomSeed
 }
@@ -527,3 +533,208 @@ function Get-RandomNumbers()
     $RandomNumbers = Get-Random -InputObject (0..$($wordsContent.count)) -Count 3 -SetSeed $Seed
     return $RandomNumbers
 }
+function Get-DiceWarePassphrase()
+{
+    do{
+        $PassphraseArray=@()
+        foreach($number in (1..$NumberOfWordsInDiceWarePassphrase))
+        {
+            $DiceWareWord=Get-DiceWareWord
+            $PassphraseArray+=$DiceWareWord
+        }
+        $Passphrase=$PassphraseArray -join ' '
+        
+        $PassphraseIsLongEnough=Test-PassphraseLength -Passphrase $Passphrase
+    }
+    while($PassphraseIsLongEnough -eq $false )
+    
+    Set-Variable -Name RandomPassword -Value $Passphrase -Scope 1
+}
+function Test-PassphraseLength()
+{
+    Param(
+        $Passphrase
+    )
+    $PassphraseWithoutSpaces=$Passphrase.replace(' ','')
+    $ExpectedMinimumPassphraseLength=17
+    $PassphraseLength=($PassphraseWithoutSpaces | Measure-Object -Character).Characters
+    
+    if($PassphraseLength -lt $ExpectedMinimumPassphraseLength)
+    {
+        return $false
+    }
+    else
+    {
+        return $true
+    }
+        
+}
+function Get-DiceWareWord()
+{
+    $SidesOfDice=6
+    $NumberOfRoles=5
+    $WordList=Get-DiceWareWordList
+    $Number=Get-DiceWareNumber
+    $SpecialorDigit=Get-SpecialOrDigit
+    $RandomBool=Get-RandomBool
+    
+    $Word=$($WordList | where {$_.Number -eq $Number}).Word
+    if($RandomBool)
+    {
+        $WordWithSpecialOrDigit="$Word$SpecialOrDigit"
+        return $WordWithSpecialOrDigit
+    }
+    else
+    {
+        return $Word
+    }
+    
+}
+function Get-RandomBool()
+{
+    $Bool=Get-RandomDiceRoll -min 0 -max 2
+    switch($Bool)
+    {
+        0 {return $false}
+        1 {return $true}
+    }
+    
+}
+function Get-SpecialOrDigit()
+{
+    $SidesOfDice=6
+    $Number1=Get-RandomDiceRoll -min 0 -max $SidesOfDice
+    $Number2=Get-RandomDiceRoll -min 0 -max $SidesOfDice
+    $table=Generate-DiceWareSpecialOrDigitTable
+    
+    $Character=$table[$number1][$number2]
+    return $Character
+    
+}
+function Generate-DiceWareSpecialOrDigitTable()
+{
+    $table=@(
+        @('~','!','#','$','%','^'),
+        @('&','*','(',')','-','='),
+        @('+','[',']','\','{','}'),
+        @(':',';','"',"'",'<','>'),
+        @('?','/','0','1','2','3'),
+        @('4','5','6','7','8','9')
+    )
+    return $table
+    
+}
+function Get-DiceWareWordList()
+{
+    if(test-path $DiceWareWordsFileFullPath)
+    {
+        $DiceWareWordList=Import-DiceWareWordList
+        $WordListTestsGood=Test-ImportedDiceWareWordList -WordList $DiceWareWordList
+        
+        if($WordListTestsGood -eq $false)
+        {
+            $DiceWareWordList=DownloadAndSave-DiceWareWordList
+        }
+    }
+    else
+    {
+        $DiceWareWordList=DownloadAndSave-DiceWareWordList
+    }
+    return $DiceWareWordList
+}
+function Test-ImportedDiceWareWordList()
+{
+    Param(
+        $WordList
+    )
+    
+    $WordListNoteProperties=($WordList | Get-Member -MemberType NoteProperty).Name
+    
+    $WordListContainsExpectedProperties=(($WordListNoteProperties -contains 'Word') -and ($WordListNoteProperties -contains 'Number'))
+    $WordListContainsExpectedCount=($WordList.count -eq 7776)
+    
+    if($WordListContainsExpectedProperties -and $WordListContainsExpectedCount)
+    {
+        return $true
+    }
+    else
+    {
+        return $false
+    }
+}
+function DownloadAndSave-DiceWareWordList()
+{
+    $DiceWareWordList=Download-DiceWareWordList
+    Export-DiceWareWordListToCSV -WordList $DiceWareWordList
+    return $DiceWareWordList
+}
+function Download-DiceWareWordList()
+{
+    $WordList=Invoke-WebRequest -UseBasicParsing http://world.std.com/~reinhold/diceware.wordlist.asc
+    $WordListContent=$WordList.Content -split "`n" | select -skip 2 | select -first 7776
+    
+    $NumberAndWordListArray=@()
+    foreach($Line in $WordListContent)
+    {
+        $Number=$Line.substring(0,5)
+        $Word=$Line.substring(6)
+        $NumberAndWord = New-Object -TypeName psobject
+        $NumberAndWord | Add-Member -MemberType NoteProperty -Name Number -Value $Number
+        $NumberAndWord | Add-Member -MemberType NoteProperty -Name Word -Value $Word
+        
+        $NumberAndWordListArray+=$NumberAndWord
+    }
+    
+    return $NumberAndWordListArray
+}
+function Export-DiceWareWordListToCSV()
+{
+    Param(
+        $WordList
+    )
+    $WordList | Export-Csv -Path $DiceWareWordsFileFullPath -NoTypeInformation
+}
+function Import-DiceWareWordList()
+{
+    $NumberAndWordListArray=Import-Csv -Path $DiceWareWordsFileFullPath
+    return $NumberAndWordListArray
+}
+function Get-DiceWareNumber()
+{
+    Set-Variable -Name DiceWareNumber -Value @()
+    foreach($number in (1..$NumberOfRoles))
+    {
+        $DiceWareNumber+=Get-RandomDiceRoll -min 1 -max $($SidesOfDice + 1)
+    }
+    $DiceWareNumber=$DiceWareNumber -join ''
+    
+    return $DiceWareNumber
+}
+function Get-RandomDiceRoll()
+{
+    Param(
+        $min,
+        $max
+    )
+    $Seed=Get-CryptoSeed
+    
+    $Roll=Get-Random -SetSeed $Seed -Minimum $min -Maximum $max
+    
+    return $Roll
+    
+}
+function Get-CryptoSeed()
+{
+    $bytes = New-Object -TypeName byte[] -ArgumentList (4)
+    $RNG = [Security.Cryptography.RNGCryptoServiceProvider]::Create()
+    $RNG.GetBytes($bytes)
+    
+    $totalInt = 1
+    foreach($int in $bytes)
+    {
+        $totalInt = $totalInt * $int
+    }
+    $RandomSeed = ($totalInt / 2) -1
+    return $RandomSeed
+}
+
