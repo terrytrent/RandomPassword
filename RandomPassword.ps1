@@ -4,7 +4,7 @@ function Get-RandomPassword()
     Param(
         
         [parameter(Mandatory = $true,Position = 0)]
-        [ValidateSet('Random Characters','Word List','DiceWare Passphrase')]
+        [ValidateSet('Random Characters','Word List','Diceware Passphrase')]
         $PasswordType,
         
         $Length,
@@ -33,9 +33,9 @@ function Get-RandomPassword()
     {
         Get-WordListPassword
     }
-    elseif($PasswordType -eq 'DiceWare Passphrase')
+    elseif($PasswordType -eq 'Diceware Passphrase')
     {
-        Get-DiceWarePassphrase
+        Get-DicewarePassphrase
     }
 
     return $RandomPassword
@@ -49,19 +49,19 @@ function Setup()
 }
 function Validate-Parameters()
 {
-    if((($PasswordType -eq 'Word List') -or ($PasswordType -eq 'DiceWare Passphrase')) -and ($ComplexitySwitchesEnabled -eq $true))
+    if((($PasswordType -eq 'Word List') -or ($PasswordType -eq 'Diceware Passphrase')) -and ($ComplexitySwitchesEnabled -eq $true))
     {
         $message = "Cannot use Complexity Switches with '$PasswordType' Passwords."
         throw($message)
         break
     }
     
-    if(($PasswordType -eq 'Word List') -or ($PasswordType -eq 'DiceWare Passphrase'))
+    if(($PasswordType -eq 'Word List') -or ($PasswordType -eq 'Diceware Passphrase'))
     {
         write-warning -Message "You have selected a '$PasswordType' Password - this will take a few moments to generate"
     }
     
-    if((($PasswordType -eq 'Word List') -or ($PasswordType -eq 'DiceWare Passphrase')) -and ($Length -ne $null))
+    if((($PasswordType -eq 'Word List') -or ($PasswordType -eq 'Diceware Passphrase')) -and ($Length -ne $null))
     {
         write-warning -Message "Cannot use Length Parameter with '$PasswordType' Password Type. Ignoring Length Parameter."
         Set-Variable -Name Length -Scope 2 -Value $null
@@ -107,8 +107,8 @@ function Declare-Variables()
     New-Variable -Name wordsUri -Value 'http://www.freescrabbledictionary.com/sowpods/download/sowpods.txt' -Scope 2
     New-Variable -Name lastModifiedFile -Value "$scriptLocation\lastmodified.txt" -Scope 2
     New-Variable -Name wordsContentFileFull -Value "$scriptLocation\WordList.csv" -Scope 2
-    New-Variable -Name DiceWareWordsFileFullPath -Value "$scriptLocation\DiceWareWordList.csv" -Scope 2
-    New-Variable -Name NumberOfWordsInDiceWarePassphrase -Value 7 -Scope 2
+    New-Variable -Name DicewareWordsFileFullPath -Value "$scriptLocation\DicewareWordList.csv" -Scope 2
+    New-Variable -Name NumberOfWordsInDicewarePassphrase -Value 7 -Scope 2
 }
 function Test-ComplexitySwitches()
 {
@@ -533,14 +533,14 @@ function Get-RandomNumbers()
     $RandomNumbers = Get-Random -InputObject (0..$($wordsContent.count)) -Count 3 -SetSeed $Seed
     return $RandomNumbers
 }
-function Get-DiceWarePassphrase()
+function Get-DicewarePassphrase()
 {
     do{
         $PassphraseArray=@()
-        foreach($number in (1..$NumberOfWordsInDiceWarePassphrase))
+        foreach($number in (1..$NumberOfWordsInDicewarePassphrase))
         {
-            $DiceWareWord=Get-DiceWareWord
-            $PassphraseArray+=$DiceWareWord
+            $DicewareWord=Get-DicewareWord
+            $PassphraseArray+=$DicewareWord
         }
         $Passphrase=$PassphraseArray -join ' '
         
@@ -569,12 +569,12 @@ function Test-PassphraseLength()
     }
         
 }
-function Get-DiceWareWord()
+function Get-DicewareWord()
 {
     $SidesOfDice=6
     $NumberOfRoles=5
-    $WordList=Get-DiceWareWordList
-    $Number=Get-DiceWareNumber
+    $WordList=Get-DicewareWordList
+    $Number=Get-DicewareNumber
     $SpecialorDigit=Get-SpecialOrDigit
     $RandomBool=Get-RandomBool
     
@@ -605,13 +605,13 @@ function Get-SpecialOrDigit()
     $SidesOfDice=6
     $Number1=Get-RandomDiceRoll -min 0 -max $SidesOfDice
     $Number2=Get-RandomDiceRoll -min 0 -max $SidesOfDice
-    $table=Generate-DiceWareSpecialOrDigitTable
+    $table=Generate-DicewareSpecialOrDigitTable
     
     $Character=$table[$number1][$number2]
     return $Character
     
 }
-function Generate-DiceWareSpecialOrDigitTable()
+function Generate-DicewareSpecialOrDigitTable()
 {
     $table=@(
         @('~','!','#','$','%','^'),
@@ -624,25 +624,25 @@ function Generate-DiceWareSpecialOrDigitTable()
     return $table
     
 }
-function Get-DiceWareWordList()
+function Get-DicewareWordList()
 {
-    if(test-path $DiceWareWordsFileFullPath)
+    if(test-path $DicewareWordsFileFullPath)
     {
-        $DiceWareWordList=Import-DiceWareWordList
-        $WordListTestsGood=Test-ImportedDiceWareWordList -WordList $DiceWareWordList
+        $DicewareWordList=Import-DicewareWordList
+        $WordListTestsGood=Test-ImportedDicewareWordList -WordList $DicewareWordList
         
         if($WordListTestsGood -eq $false)
         {
-            $DiceWareWordList=DownloadAndSave-DiceWareWordList
+            $DicewareWordList=DownloadAndSave-DicewareWordList
         }
     }
     else
     {
-        $DiceWareWordList=DownloadAndSave-DiceWareWordList
+        $DicewareWordList=DownloadAndSave-DicewareWordList
     }
-    return $DiceWareWordList
+    return $DicewareWordList
 }
-function Test-ImportedDiceWareWordList()
+function Test-ImportedDicewareWordList()
 {
     Param(
         $WordList
@@ -662,15 +662,15 @@ function Test-ImportedDiceWareWordList()
         return $false
     }
 }
-function DownloadAndSave-DiceWareWordList()
+function DownloadAndSave-DicewareWordList()
 {
-    $DiceWareWordList=Download-DiceWareWordList
-    Export-DiceWareWordListToCSV -WordList $DiceWareWordList
-    return $DiceWareWordList
+    $DicewareWordList=Download-DicewareWordList
+    Export-DicewareWordListToCSV -WordList $DicewareWordList
+    return $DicewareWordList
 }
-function Download-DiceWareWordList()
+function Download-DicewareWordList()
 {
-    $WordList=Invoke-WebRequest -UseBasicParsing http://world.std.com/~reinhold/diceware.wordlist.asc
+    $WordList=Invoke-WebRequest -UseBasicParsing http://world.std.com/~reinhold/Diceware.wordlist.asc
     $WordListContent=$WordList.Content -split "`n" | select -skip 2 | select -first 7776
     
     $NumberAndWordListArray=@()
@@ -687,28 +687,28 @@ function Download-DiceWareWordList()
     
     return $NumberAndWordListArray
 }
-function Export-DiceWareWordListToCSV()
+function Export-DicewareWordListToCSV()
 {
     Param(
         $WordList
     )
-    $WordList | Export-Csv -Path $DiceWareWordsFileFullPath -NoTypeInformation
+    $WordList | Export-Csv -Path $DicewareWordsFileFullPath -NoTypeInformation
 }
-function Import-DiceWareWordList()
+function Import-DicewareWordList()
 {
-    $NumberAndWordListArray=Import-Csv -Path $DiceWareWordsFileFullPath
+    $NumberAndWordListArray=Import-Csv -Path $DicewareWordsFileFullPath
     return $NumberAndWordListArray
 }
-function Get-DiceWareNumber()
+function Get-DicewareNumber()
 {
-    Set-Variable -Name DiceWareNumber -Value @()
+    Set-Variable -Name DicewareNumber -Value @()
     foreach($number in (1..$NumberOfRoles))
     {
-        $DiceWareNumber+=Get-RandomDiceRoll -min 1 -max $($SidesOfDice + 1)
+        $DicewareNumber+=Get-RandomDiceRoll -min 1 -max $($SidesOfDice + 1)
     }
-    $DiceWareNumber=$DiceWareNumber -join ''
+    $DicewareNumber=$DicewareNumber -join ''
     
-    return $DiceWareNumber
+    return $DicewareNumber
 }
 function Get-RandomDiceRoll()
 {
