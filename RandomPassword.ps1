@@ -461,7 +461,7 @@ function Get-WordFileUIRHeaders()
 {
     try
     {
-        New-Variable -Name wordsRequest -Value $(Invoke-WebRequest -Uri $wordsUri -Method head -ErrorAction SilentlyContinue) -Scope 1
+        New-Variable -Name wordsRequest -Value $(Invoke-WebRequest -Uri $wordsUri -Method head -ErrorAction SilentlyContinue -UserAgent ([Microsoft.PowerShell.Commands.PSUserAgent]::InternetExplorer)) -Scope 1
     }
     catch
     {
@@ -487,7 +487,7 @@ function Generate-WordList()
 }
 function Get-WordListFromURI()
 {
-    $list = (Invoke-WebRequest -Uri $wordsUri).content -split '\n' | Select-Object -Skip 2 -Property @{
+    $list = (Invoke-WebRequest -Uri $wordsUri -UserAgent ([Microsoft.PowerShell.Commands.PSUserAgent]::InternetExplorer)).content -split '\n' | Select-Object -Skip 2 -Property @{
         label      = 'WordList'
         expression = {
             $_
@@ -666,7 +666,7 @@ function DownloadAndSave-DicewareWordList()
 }
 function Download-DicewareWordList()
 {
-    $WordList=Invoke-WebRequest -UseBasicParsing http://world.std.com/~reinhold/Diceware.wordlist.asc
+    $WordList=Invoke-WebRequest -Uri http://world.std.com/~reinhold/diceware.wordlist.asc -UserAgent ([Microsoft.PowerShell.Commands.PSUserAgent]::InternetExplorer)
     $WordListContent=$WordList.Content -split "`n" | select -skip 2 | select -first 7776
     
     $NumberAndWordListArray=@()
