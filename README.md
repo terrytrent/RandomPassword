@@ -1,15 +1,12 @@
-Random Password Generator
-=========================
-Based On Uncle Bob's Clean Code
-----------
+# Random Password Generator
 First and foremost this script allows you to create three kinds of passwords:
 
 1. Random Characters
 2. Random Words
 3. Diceware Passphrase
 
-Random Characters
------------------
+## Random Characters
+---
 The First kind of password, Random Characters, can be generated with the following command and switches, and any combination thereof:
 
     Get-RandomPassword -PasswordType 'Random Characters'
@@ -26,8 +23,8 @@ Could Generate:
 
 This is the fastest method to generate a password using this script.
 
-Random Words
-------------
+## Random Words
+---
 The second kind of password, Random Words, can be generated with the following command:
 
     Get-RandomPassword -PasswordType 'Word List'
@@ -40,8 +37,8 @@ For Example:
 
 This can take several minutes because the script needs to download the word list (over 20000 words), verify it is up to date, and then pull random words from this list.
 
-Diceware Passphrase
--------------------
+## Diceware Passphrase
+---
 The third kind of password, Diceware Passphrase, can be generated with the following command:
 
     Get-RandomPassword -PasswordType 'DiceWare Passphrase'
@@ -54,8 +51,7 @@ For Example:
 
     tonic wavy0 brew{ noon8 echo adopt< hood
 
-Clean Code
-----------
+# Clean Code
 This script is also a test in Clean Code, based on Uncle Bob's Clean Code (see http://blog.cleancoder.com/ and http://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias%3Dstripbooks&field-keywords=Clean+Code+Robert+C+Martin)
 
 The book(s) referenced are written more towards actual coding languages, however I wanted to see if it would also apply to scripting languages such as PowerShell.
