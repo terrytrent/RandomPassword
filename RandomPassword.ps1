@@ -1,13 +1,49 @@
 ﻿#requires -Version 3
 function Get-RandomPassword()
 {
+    <#
+            .SYNOPSIS
+                Generates Random Passwords based on a Password Type selection
+            .DESCRIPTION
+                Generates Random Passwords based on a Password Type selection:
+                
+                Random Characters creates a password of specified length, or if none is specfied 16 characters in length.
+                Switches can be used to modify the characters in the password.
+
+                Random Words creates a password from a list of words provided by http://www.freescrabbledictionary.com/
+
+                Diceware Passphrase creates a password based on the methods described at http://world.std.com/~reinhold/diceware.html
+            .EXAMPLE
+                C:\PS>Get-RandomPassword -PasswordType 'Random Characters'
+                I}k8MmX2.'F]7L7D
+            .EXAMPLE
+                C:\PS> Get-RandomPassword -PasswordType 'Random Characters' -Length 8
+                jSOEdZ0>
+            .EXAMPLE
+                C:\PS> Get-RandomPassword -PasswordType 'Random Characters' -Length 8 -UpperCase -LowerCase
+                RsqCWkrq
+            .EXAMPLE
+                C:\PS> Get-RandomPassword -PasswordType 'Word List'
+                OdderAlbuminoidsArreeding
+            .EXAMPLE
+                C:\PS> Get-RandomPassword -PasswordType 'Diceware Passphrase'
+                season; quay belt~ our% waist jewish9 tg aide4
+            .OUTPUTS
+                System.String
+            .INPUTS
+                None
+            .LINK
+                https://github.com/terrytrent/RandomPassword
+            .LINK
+                http://world.std.com/~reinhold/diceware.html
+            #>    
     Param(
         
         [parameter(Mandatory = $true,Position = 0)]
         [ValidateSet('Random Characters','Word List','Diceware Passphrase')]
-        $PasswordType,
+        [string]$PasswordType,
         
-        $Length,
+        [int]$Length,
         
         [alias('U')]
         [Switch]$UpperCase,
@@ -108,7 +144,7 @@ function Declare-Variables()
     New-Variable -Name lastModifiedFile -Value "$scriptLocation\lastmodified.txt" -Scope 2
     New-Variable -Name wordsContentFileFull -Value "$scriptLocation\WordList.csv" -Scope 2
     New-Variable -Name DicewareWordsFileFullPath -Value "$scriptLocation\DicewareWordList.csv" -Scope 2
-    New-Variable -Name NumberOfWordsInDicewarePassphrase -Value 7 -Scope 2
+    New-Variable -Name NumberOfWordsInDicewarePassphrase -Value 8 -Scope 2
 }
 function Test-ComplexitySwitches()
 {
