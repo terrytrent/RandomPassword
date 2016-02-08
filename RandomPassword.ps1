@@ -12,7 +12,7 @@ function Get-RandomPassword()
 
                 Random Words creates a password from a list of words provided by http://www.freescrabbledictionary.com/
 
-                Diceware Passphrase creates a password based on the methods described at http://world.std.com/~reinhold/diceware.html
+                Diceware Passphrase creates a password based on the methods described at http://world.std.com/~reinhold/diceware.html, including the 'extra security' option
             .EXAMPLE
                 C:\PS>Get-RandomPassword -PasswordType 'Random Characters'
                 I}k8MmX2.'F]7L7D
@@ -79,6 +79,7 @@ function Get-RandomPassword()
 function Setup()
 {
     Declare-Variables
+    Remove-OldVersionDataIfExist
     Test-ComplexitySwitches
     Validate-Parameters
     Set-AsciiCodes
@@ -103,7 +104,7 @@ function Validate-Parameters()
         Set-Variable -Name Length -Scope 2 -Value $null
     }
         
-    if(($PasswordType -eq 'Random Characters') -and ($Length -eq $null))
+    if(($PasswordType -eq 'Random Characters') -and ($Length -lt 8))
     {
         Write-Warning -Message "Length was not set.  Cannot use Null Length with 'Random Characters' Password Type.`nDefaulting to 16 Characters."
         Set-Variable -Name Length -Scope 2 -Value 16
@@ -126,25 +127,20 @@ function Declare-Variables()
     New-Variable -Name CharacterTypeTotals -Value @{} -Scope 2
     New-Variable -Name AsciiTotals -Value @{} -Scope 2
     
-    $thisScript = $MyInvocation.MyCommand
-    try
+    $appdata=(get-item Env:\APPDATA).value
+    New-Variable -Name scriptLocation -Scope 2 -Value "$appdata\Get-RandomPassword"
+    if(-Not (Test-Path $scriptLocation))
     {
-        New-Variable -Name scriptLocation -Scope 2 -Value $(Split-Path -Path $thisScript.path -Parent)
+        New-Item -Path $scriptLocation -ItemType directory | out-null
     }
-    catch
-    {
-        New-Variable -Name scriptLocation -Scope 2 -Value 'C:\temp\Scripts\Get-WordsList'
-        if(-Not (Test-Path $scriptLocation))
-        {
-            $null = New-Item -Path $scriptLocation -ItemType directory
-        }
-    }
-    
+
     New-Variable -Name wordsUri -Value 'http://www.freescrabbledictionary.com/sowpods/download/sowpods.txt' -Scope 2
     New-Variable -Name lastModifiedFile -Value "$scriptLocation\lastmodified.txt" -Scope 2
     New-Variable -Name wordsContentFileFull -Value "$scriptLocation\WordList.csv" -Scope 2
     New-Variable -Name DicewareWordsFileFullPath -Value "$scriptLocation\DicewareWordList.csv" -Scope 2
     New-Variable -Name NumberOfWordsInDicewarePassphrase -Value 8 -Scope 2
+    
+    New-Variable -Name OldVersionDataLocations -Value @('C:\temp\Scripts\Get-WordsList') -Scope 2
 }
 function Test-ComplexitySwitches()
 {
@@ -215,6 +211,16 @@ function Set-NumbersAsciiCodes()
     $NumbersValues = $(48..57)
     $NumbersAsciiCodes = Set-AsciiCodesIfComplexitySpecified -Switch $Numbers -AsciiCodes $NumbersValues
     return $NumbersAsciiCodes
+}
+function Remove-OldVersionDataIfExist()
+{
+    foreach($location in $OldVersionDataLocations)
+    {
+        if(Test-Path -Path $location)
+        {
+            remove-item $location -Recurse -Force -Confirm:$false
+        }
+    }
 }
 function Generate-Password()
 {
