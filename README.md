@@ -2,7 +2,7 @@ Random Password Generator
 =========================
 Based On Uncle Bob's Clean Code
 ----------
-First and foremost this script allows you to create two kinds of passwords:
+First and foremost this script allows you to create three kinds of passwords:
 
 1. Random Characters
 2. Random Words
