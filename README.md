@@ -6,7 +6,6 @@ First and foremost this script allows you to create three kinds of passwords:
 3. Diceware Passphrase
 
 ## Random Characters
----
 The First kind of password, Random Characters, can be generated with the following command and switches, and any combination thereof:
 
     Get-RandomPassword -PasswordType 'Random Characters'
@@ -24,7 +23,6 @@ Could Generate:
 This is the fastest method to generate a password using this script.
 
 ## Random Words
----
 The second kind of password, Random Words, can be generated with the following command:
 
     Get-RandomPassword -PasswordType 'Word List'
@@ -38,7 +36,6 @@ For Example:
 This can take several minutes because the script needs to download the word list (over 20000 words), verify it is up to date, and then pull random words from this list.
 
 ## Diceware Passphrase
----
 The third kind of password, Diceware Passphrase, can be generated with the following command:
 
     Get-RandomPassword -PasswordType 'DiceWare Passphrase'
